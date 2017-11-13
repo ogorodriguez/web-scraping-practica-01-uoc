@@ -31,7 +31,7 @@ libraries("lubridate",     # para trabajo con fechas
           "pander",        # para mostrar elementos data.frame (issue con Rmarkdown)
           "stringr",       # para regular expressions junto con similares en base-R
           "XML",           # funciones para trabajar con formatos XML 
-          "jsonlinte",     # funciones para trabajar con formatos JSON 
+          "jsonlite",     # funciones para trabajar con formatos JSON 
           "httr")          # funciones para trabajar con APIs abiertas o con autorización
           
 
@@ -101,11 +101,12 @@ c. **fecha-evento**: La fecha en que se celebró la presentación
 d. **Id-artista**: es el código identificativo del artista facilitado por [MusicBrainz](https://musicbrainz.org/artist/013fa897-86db-41d3-8e9f-386c8a34f4e6/details)
 e. **artista**
 f. **sala-lugar**: nombre con que se conoce la sala de espectáculos en el momento de celebrarse la presentación
-g. **pais-código**: código de dos caracteres identificando el país.
-h. **pais-nombre**: nombre extenso del país en donde se celebró el evento
-i. **setlist**: listado de canciones del concierto
-j. **mes** <variable calculada>: Número del mes en que se celebró el evento
-k. **año** <variable calculada>: Año en que se celebró el evento.
+g. **cuidad**: nombre de la cuidad del evento
+h. **pais-código**: código de dos caracteres identificando el país.
+i. **pais-nombre**: nombre extenso del país en donde se celebró el evento
+j. **setlist**: listado de canciones del concierto
+k. **mes** <variable calculada>: Número del mes en que se celebró el evento
+mn. **año** <variable calculada>: Año en que se celebró el evento.
 
 Para más detalles sobre este punto ver el apartado *Observaciones*
 
@@ -144,6 +145,8 @@ Aprovecho este punto para ofrecer algunas observaciones sobre mi experiencia a l
     b. Las setlists quedan en una colunmna y con format bastant complejo anidando información según la estructura de setlist.fm.  Una trabajo quizá a través de XML y sus librerías en R pudieran acercar un poco más la identificación de las setlists con el resto, pero intuyo que sería un set separado que luego habría que unificar a través de join, etc.
     
     c. Si bien el paquete jsonlite presenta ciertas dificultados, sí ha podido ofrecer una conversión, desde mi punto de vista, fluida hacia lo que es un data frame.  Los datos se preprocesan hasta lograr dos variable calculadas para identificar el tiempo.
+    
+    d. La API de setlist.fm, si bien requiere su obtención a través de un correo electrónico, obtener los informes con respuestas Json o XML no requiere incluir el token correspondientes.  Version 1.0.
 
 
 Con estas observaciones hechas procedo a las preguntas que me han surgido o que podría surgirle a alguien que  mire este conjunto de datos.
@@ -169,6 +172,102 @@ La licencia seleccionada es: Released Under CC0: Public Domain License
 He seleccionado esta licencia porque se adapta a la naturaleza académica de este trabajo.  Además ofrece la flexibilidad a todo aquel que quiera expandir las acciones iniciadas aquí y que incluyo en los apartados correspondientes.  La práctica me ha regalado más preguntas que respuestas, lo que me motiva a seguir indagando.
 
 Más detalles sobre la misma en la ruta del repo:  web-scraping-practica-01-uoc/LICENSE , y [aquí](https://choosealicense.com/licenses/cc0-1.0/)
+
+
+## 9. Código
+
+Adjuntar el código que ha ayudado a generar el dataset (en R)
+
+```{r, include=FALSE}
+
+# código no se muestra al final
+
+# Se revisa la librería jsonlite cargada en item 34.
+
+# Obtenemos de MusicBrainz el código correspondiente al artista Morrissey y lo cargamos 
+# a una variable mbid para la creación de la url json.  Ver item 101
+mbid <- "013fa897-86db-41d3-8e9f-386c8a34f4e6"
+
+# Procedemos a cargar todas las páginas correspondientes al artista desde
+# la API.  Un vistazo rápido a la página 1
+# (http://api.setlist.fm/rest/0.1/artist/013fa897-86db-41d3-8e9f-386c8a34f4e6/setlists.json?p=1)
+# Muestra que hay 20 ítems por página, y un total de 1001 ítems
+# el for-loop lo haremos hasta la página 51.  1001/20 = 50.05.
+
+urlbase <- "http://api.setlist.fm/rest/0.1/artist/013fa897-86db-41d3-8e9f-386c8a34f4e6/setlists.json?"
+
+# Creamos una variable lista vacía para mantener la clase lista en el resultado y hacemos el for-loop.
+
+pagesT <- list()
+
+for( i in 1:51 ) {
+  jsonLocs <- as.data.frame(fromJSON(paste0(urlbase, "p=", i), flatten = TRUE))
+  message("Retrieving page ", i)
+  pagesT[[i]] <- jsonLocs
+  
+}
+
+```
+
+
+
+
+```{r, codigo-generar-dataset-10}
+# Unimos los objetos correspondientes y revisamos la clase
+jsonLocsTotal <- rbind_pages(pagesT)
+
+class(jsonLocsTotal)
+
+```
+
+Ahora haremos la selección de las columnas que nos interesen y cambiamos su nombres por otros más amigables
+
+
+```{r, codigo-generar-dataset-10}
+
+dataSet <- jsonLocsTotal %>% 
+              select(id.setlist = setlists.setlist..id, 
+                     tour = setlists.setlist..tour,
+                     fecha.evento = setlists.setlist..eventDate,
+                     info = setlists.setlist.info,
+                     id.artista = setlists.setlist.artist..mbid,
+                     artista = setlists.setlist.artist..name,
+                     lugar = setlists.setlist.venue..name,
+                     ciudad = setlists.setlist.venue.city..name,
+                     pais.codigo = setlists.setlist.venue.city.country..code,
+                     pais.nombre = setlists.setlist.venue.city.country..name,
+                     setlist = setlists.setlist.sets.set)
+                     
+# Vemos la estructura
+glimpse(dataSet)
+
+```
+
+Agregamos variables calculadas para determinar el mes y el año.  La variable fecha.evento está en formato chr.  Hacemos también cambios a factor en tour, pais, ciudad.
+
+```{r, cambios-variables-dataset}
+
+dataSet <- dataSet %>% 
+  mutate(tour = as.factor(tour),
+         fecha.evento = dmy(fecha.evento),
+         ciudad = as.factor(ciudad),
+         pais.codigo = as.factor(pais.codigo),
+         pais.nombre = as.factor(pais.nombre))
+
+glimpse(dataSet)
+  
+
+```
+
+Añadimos dos variables calculadas a partir del parámetro fecha.evento.  El mes y el año.
+
+
+```{r, variables-calculadas-fecha}
+
+dataSet <- dataSet %>% 
+  mutate(mes = month(fecha.evento)) %>% 
+  mutate(año = year(fecha.evento))
+```
 
 
 
