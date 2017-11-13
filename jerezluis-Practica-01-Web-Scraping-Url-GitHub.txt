@@ -1,0 +1,13 @@
+PRACTICA 01-Web Scraping
+Luis Jerez Rincon
+13 de noviembre, 2017
+
+Este es el documento con el enlace a la página de github:
+
+https://github.com/ogorodriguez/web-scraping-practica-01-uoc.git
+
+Mi usuario en github is ogorodriguez.
+
+Muchas gracias.
+
+
