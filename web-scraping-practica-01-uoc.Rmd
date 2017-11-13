@@ -124,8 +124,9 @@ Previamente se han hecho desarrollos en Python tomando como fuente de datos los 
 Uno de los que destaco es el de Fabio Lamanna [TheConcertsTracker.py](https://github.com/fblamanna/TheConcertsTracker) que recoge el histórico de conciertos de setlist.fm.  Debido a mi escaso conocimiento en Python, no he podido reproducir ni aprovechar el desarrollo.  Sin embargo, sí me hizo ver las posibilidades que tiene el entorno de datos que posee setlist.fm en la materia, ya no de la granularidad que lleva una canción en sí, si no todas ellas en su conjunto y como van de la mano de una representación en vivo del artista.  El desarrollo también permite hacer un rastreo de las setlist.
 
 
+\pagebreak
 
-
+# Bibliografía y Referencias
 
 
 
