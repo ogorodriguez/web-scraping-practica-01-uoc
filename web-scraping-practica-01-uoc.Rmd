@@ -3,12 +3,12 @@ title: "PRACTICA 01-Web Scraping"
 author: "Luis Jerez Rincon"
 date: '`r format(Sys.Date(),"%e de %B, %Y")`'
 output:
+  pdf_document:
+    toc: yes
   html_document:
     toc: yes
     toc_depth: 2
     toc_float: yes
-  pdf_document:
-    toc: yes
   word_document:
     toc: yes
 bibliography: Practica-01-Web-Scraping-biblio.bib
@@ -223,7 +223,7 @@ class(jsonLocsTotal)
 Ahora haremos la selección de las columnas que nos interesen y cambiamos su nombres por otros más amigables
 
 
-```{r, codigo-generar-dataset-10}
+```{r, codigo-generar-dataset-20}
 
 dataSet <- jsonLocsTotal %>% 
               select(id.setlist = setlists.setlist..id, 
@@ -243,7 +243,7 @@ glimpse(dataSet)
 
 ```
 
-Agregamos variables calculadas para determinar el mes y el año.  La variable fecha.evento está en formato chr.  Hacemos también cambios a factor en tour, pais, ciudad.
+Agregamos variables calculadas para determinar el mes y el año.  La variable fecha.evento está en formato chr.  Hacemos también cambios a factor en tour, pais, ciudad, y lugar.  El dato setlist lo paso a character para que permita guardar en csv.  
 
 ```{r, cambios-variables-dataset}
 
@@ -252,7 +252,9 @@ dataSet <- dataSet %>%
          fecha.evento = dmy(fecha.evento),
          ciudad = as.factor(ciudad),
          pais.codigo = as.factor(pais.codigo),
-         pais.nombre = as.factor(pais.nombre))
+         lugar = as.factor(lugar)
+         pais.nombre = as.factor(pais.nombre),
+         setlist = as.character(setlist))
 
 glimpse(dataSet)
   
@@ -266,10 +268,26 @@ Añadimos dos variables calculadas a partir del parámetro fecha.evento.  El mes y
 
 dataSet <- dataSet %>% 
   mutate(mes = month(fecha.evento)) %>% 
-  mutate(año = year(fecha.evento))
+  mutate(año = year(fecha.evento))  # en inglés p
+```
+
+Con esto el código ya estaría listo para analizar.
+
+Guardamos el código resultante.
+
+```{r, guardar-dataset}
+write.csv(dataSet, "dataSet.csv")
+
 ```
 
 
+
+
+## Observaciones finales.
+
+Este código se puede reutilizar para cualquier otro artista simplemente cambiando el código correspondiente.  
+
+Una 
 
 \pagebreak
 
