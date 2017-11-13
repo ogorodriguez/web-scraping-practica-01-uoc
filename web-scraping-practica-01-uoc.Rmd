@@ -156,7 +156,7 @@ Con estas observaciones hechas procedo a las preguntas que me han surgido o que 
  * ¿Es extrapolable este set para hacer un análisis similar para otro artista?
  * Preguntas tipo EDA: Año de mayor número de eventos, el mínimo de eventos.
  * ¿Cambia el número de eventos tipo Tour a lo largo del tiempo?
- * ¿Se puede predecir el patrón de países a visitar (o de cuidades)
+ * ¿Se puede predecir el patrón de países a visitar (o de cuidades)?
  * ¿Se pueden vincular o hacer cross-reference con otros datasets como los de MusicBrainz, o Wikipedia (información financiera de los conciertos)
  
 ## 8. Licencia.
