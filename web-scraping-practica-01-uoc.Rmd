@@ -3,14 +3,14 @@ title: "PRACTICA 01-Web Scraping"
 author: "Luis Jerez Rincon"
 date: '`r format(Sys.Date(),"%e de %B, %Y")`'
 output:
+  word_document:
+    toc: yes
   pdf_document:
     toc: yes
   html_document:
     toc: yes
     toc_depth: 2
     toc_float: yes
-  word_document:
-    toc: yes
 bibliography: Practica-01-Web-Scraping-biblio.bib
 urlcolor: blue
 ---
