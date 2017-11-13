@@ -246,13 +246,12 @@ glimpse(dataSet)
 Agregamos variables calculadas para determinar el mes y el año.  La variable fecha.evento está en formato chr.  Hacemos también cambios a factor en tour, pais, ciudad, y lugar.  El dato setlist lo paso a character para que permita guardar en csv.  
 
 ```{r, cambios-variables-dataset}
-
 dataSet <- dataSet %>% 
   mutate(tour = as.factor(tour),
          fecha.evento = dmy(fecha.evento),
          ciudad = as.factor(ciudad),
          pais.codigo = as.factor(pais.codigo),
-         lugar = as.factor(lugar)
+         lugar = as.factor(lugar),
          pais.nombre = as.factor(pais.nombre),
          setlist = as.character(setlist))
 
