@@ -1,0 +1,187 @@
+---
+title: "PRACTICA 01-Web Scraping"
+author: "Luis Jerez Rincon"
+date: '`r format(Sys.Date(),"%e de %B, %Y")`'
+output:
+  html_document:
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  pdf_document:
+    toc: yes
+  word_document:
+    toc: yes
+bibliography: Practica-01-Web-Scraping-biblio.bib
+urlcolor: blue
+---
+
+
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE)
+
+```
+
+```{r, load-libraries, include = FALSE}
+library(easypackages)
+libraries("lubridate",     # para trabajo con fechas
+          "ggplot2",       # para visualizar variables si fuese necesario
+          "dplyr",         # gestión de datos data frame
+          "tidytext",      # para análisis de texto si fuese necesario
+          "tidyr",         # ordenamiento de variables, spread(), gather(), etc.
+          "pander",        # para mostrar elementos data.frame (issue con Rmarkdown)
+          "stringr",       # para regular expressions junto con similares en base-R
+          "XML",           # funciones para trabajar con formatos XML 
+          "jsonlinte",     # funciones para trabajar con formatos JSON 
+          "httr")          # funciones para trabajar con APIs abiertas o con autorización
+          
+
+```
+
+```{r, check-dir, include = FALSE}
+getwd()
+
+```
+
+
+\pagebreak
+
+# Práctica 1 - Tipología y Ciclo de vida de los datos.  Web Scraping
+
+# Objetivo (Transcripción del enunciado):
+
+El objetivo de esta actividad será la creación de un dataset a partir de los datos contenidos en la web, indicando características requeridas para este práctica.                   
+
+# 1. Título del dataset.
+
+*Poned un título que sea descriptivo.*
+
+El dataset lleva por título: "How Soon is Now: Morrissey On Tour. Estadísticas de conciertos, lugares y fechas"
+
+
+# 2. Subtítulo del dataset.
+
+*Agregad una descripción ágil de vuestro conjunto de datos para el subtítulo.*
+
+El dataset present información sobre los conciertos y apariciones frente a público del cantante de Stephen Patrick Morrissey (born 22 May 1959), antiguo cantante de The Smiths.  El set presenta los eventos pasados y actuales ofrecidos desde la API [setlist.fm](http://setlist.fm).
+
+El cantante está actualmente de gira promocional de su último disco estrenado en Noviembre 2017, y se ha mantenido de gira en varios países a lo largo de los años desde que inició su carrera en solitario en 1988.  Por tal razón es una oportunidad para sus fans, entre los que me incluyo, de verlo en escena, de ir a los sitios donde tenemos que ir a verle, conocer a alguien interesante; por lo que nos preguntamos: How soon is Now?
+
+# 3. Imagen.
+
+La imagen que identifica al set, y que encontraréis también en la cuenta GitHUb es:
+
+![Morrissey-Concert-Berlin](https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Morrissey_and_band_at_Zitadelle_Spandau_in_Berlin_2011.jpg/640px-Morrissey_and_band_at_Zitadelle_Spandau_in_Berlin_2011.jpg)
+
+Autoría: By Alexander from Berlin, Germany (Morrissey #4) 
+[CC BY 2.0 (http://creativecommons.org/licenses/by/2.0)], via Wikimedia Commons
+
+
+# 4. Contexto
+
+¿Cuál es la materia del conjuto de datos?
+
+Estos datos se pueden categorizar dentro del renglón Entretenimiento u ocio.  El mundo del espectáculo genera grandes movimientos de personas, materiales y financieros alrededor de las producciones o eventos ya sean de mayor o menor escala.  Se buscan formas de aprovechar las herramientas de la ciencia de datos/big data/data mining, etc. para construir escenarios nuevos en donde competir y lograr ofertas atractivas [@Lippell2016].  Entre ellos están los agregadores: páginas como rottentomatoes, metacritic, y las redes sociales, que gracias al aporte de usuarios a través de sus perfiles, comentarios e interacciones son un elemento clave para dicho sector, al tener por fin ese parte del conocimiento que posee el usuariro final.
+
+
+# 5. Contenido
+
+¿Qué campos incluye? ¿Cuál es el período de tiempo de los datos y cómo se han recogid?
+
+El set de datos presenta los siguientes campos:
+
+a. **id-setlist**: campo importante para el contenido extraído de setlist.fm  Identifica la lista de canciones cantandas en el concierto
+b. **tour**: nombre de la gira si la presentación ha sido parte de una serie de conciertos
+c. **fecha-evento**: La fecha en que se celebró la presentación
+d. **Id-artista**: es el código identificativo del artista facilitado por [MusicBrainz](https://musicbrainz.org/artist/013fa897-86db-41d3-8e9f-386c8a34f4e6/details)
+e. **artista**
+f. **sala-lugar**: nombre con que se conoce la sala de espectáculos en el momento de celebrarse la presentación
+g. **pais-código**: código de dos caracteres identificando el país.
+h. **pais-nombre**: nombre extenso del país en donde se celebró el evento
+i. **setlist**: listado de canciones del concierto
+j. **mes** <variable calculada>: Número del mes en que se celebró el evento
+k. **año** <variable calculada>: Año en que se celebró el evento.
+
+Para más detalles sobre este punto ver el apartado *Observaciones*
+
+# 6. Agradecimientos.
+
+¿Quién es el propietario del conjunto de datos?  Incluid citas de investigacion o análisis posteriores.
+
+El propietario del conjunto de datos es el site: sitelist.fm.  El site engloba principalmente la lista de canciones que un cantante o grupo haya presentado en un concierto, recital, festival, etc.  Es una págian que lleva cierto tiempo y que ha ido desplegando su API para fines no-comercial, o comerciales previa comunicación con los propietarios.
+
+En su política de permisos resaltan que es necesario hacer mención de la propiedad de los datos con los que se trabaja desde sus wikis incluyendo el snippet que pego a continuación:
+
+`Source: <a href="https://www.setlist.fm/>concert setlists on setlist.fm` 
+
+ya sea en una web o bien dentro de un documento como éste.  Como el objetivo de este trabajo no es comercial no es necesario avisar a setlist.fm.  
+
+Este trabajo estaré público y visible desde Github por lo que también se satisface un requerimiento de facil acceso por parte de los buscadores web.
+
+Para más información leer la información en el portal de setlist.fm [Terms of Service](https://www.setlist.fm/help/terms#Use-of-Setlist.fm-API)
+
+Previamente se han hecho desarrollos en Python tomando como fuente de datos los de la API de setlist.fm.  Haciendo una búsqueda en GitHub aparecen varios desarollos en Python, Jave, etc.  No aparecen aún desarrollos hechos directamente desde R.
+
+Uno de los que destaco es el de Fabio Lamanna [TheConcertsTracker.py](https://github.com/fblamanna/TheConcertsTracker) que recoge el histórico de conciertos de setlist.fm.  Debido a mi escaso conocimiento en Python, no he podido reproducir ni aprovechar el desarrollo.  Sin embargo, sí me hizo ver las posibilidades que tiene el entorno de datos que posee setlist.fm en la materia, ya no de la granularidad que lleva una canción en sí, si no todas ellas en su conjunto y como van de la mano de una representación en vivo del artista.  El desarrollo también permite hacer un rastreo de las setlist.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
