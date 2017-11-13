@@ -55,7 +55,7 @@ Los ficheros R, Rmd, Rproj, README, LICENSE, Wiki y demás están el repositorio G
 
 https://github.com/ogorodriguez/web-scraping-practica-01-uoc.git
 
-Mi cuenta en GitHub es ogorodriguez, la cual abría hace tiempo con un pseudónimo.
+Mi cuenta en GitHub es ogorodriguez, la cual abrí hace tiempo con un pseudónimo.
 
 ## 1. Título del dataset.
 
@@ -156,7 +156,7 @@ Con estas observaciones hechas procedo a las preguntas que me han surgido o que 
  * ¿Es extrapolable este set para hacer un análisis similar para otro artista?
  * Preguntas tipo EDA: Año de mayor número de eventos, el mínimo de eventos.
  * ¿Cambia el número de eventos tipo Tour a lo largo del tiempo?
- * ¿Se puede predecir el patrón de países a visitar (o de cuidades (variable no incluida))
+ * ¿Se puede predecir el patrón de países a visitar (o de cuidades)
  * ¿Se pueden vincular o hacer cross-reference con otros datasets como los de MusicBrainz, o Wikipedia (información financiera de los conciertos)
  
 ## 8. Licencia.
@@ -272,6 +272,8 @@ dataSet <- dataSet %>%
 
 Con esto el código ya estaría listo para analizar.
 
+## 10. Cargar archivo CSV
+
 Guardamos el código resultante.
 
 ```{r, guardar-dataset}
@@ -279,7 +281,7 @@ write.csv(dataSet, "dataSet.csv")
 
 ```
 
-
+Lo guardo como dataSet porque el nombre HowSoonIsNow me parece largo.
 
 
 ## Observaciones finales.
